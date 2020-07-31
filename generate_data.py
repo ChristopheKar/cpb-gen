@@ -4,20 +4,27 @@ import random
 import cv2 as cv
 import numpy as np
 
+MASK_ROOT = 'pest_detection/datasets/aub_11_11/mask_samples/masks'
+MAX_EXT = ('.png')
 
 def show_img(image, title='image'):
+    
+    """ Display image with default title"""
+    
     cv.imshow(title, image)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
 
 def load_pest_masks(all_pests, stage='adult'):
+    
+    """Load provided pest masks from input directory"""
+    
     pest_masks = {}
-    root_path = '/home/chrisk/Projects/pest_detection/datasets/aub_11_11/mask_samples/masks'
     for pest_name in all_pests:
         pest_mask_paths = []
-        for mask_name in os.listdir(root_path):
-            if mask_name.endswith('.png') and 'mask' in mask_name and 'masks' not in mask_name:
+        for mask_name in os.listdir(MASK_ROOT):
+            if mask_name.endswith(MASK_EXT) and 'mask' in mask_name and 'masks' not in mask_name:
                 if pest_name in mask_name and stage in mask_name:
                     pest_mask_paths.append(os.path.join(root_path, mask_name))
         pest_masks[pest_name] = pest_mask_paths
@@ -25,10 +32,19 @@ def load_pest_masks(all_pests, stage='adult'):
 
 
 def click_and_crop(event, x, y, flags, param):
+    
+    """Handle click events for object annotation and placement"""
+
+    # Set global variables for generated and labeled locations
     global desired_locations, existing_boxes, placing, cropping
+    
+    ## On Left-Mouse-Click: Label Object
+    # On Left-Mouse-Click-Down: Set starting bounding box coordinates
     if flags == cv.EVENT_FLAG_LBUTTON and event == cv.EVENT_LBUTTONDOWN:
+        # Append (min_x, min_y) to labeling list
         existing_boxes.append((x,y))
         cropping = True
+    # On Left-Mouse-Click-Up: Set end bounding box coordinates
     elif flags == cv.EVENT_FLAG_LBUTTON and event == cv.EVENT_LBUTTONUP:
         cropping = False
         existing_boxes[-1] = [existing_boxes[-1], (x,y)]
@@ -47,6 +63,9 @@ def click_and_crop(event, x, y, flags, param):
 
 
 def display_drawing_instructions():
+
+    """Display tool instructions in a friendly format"""
+    
     print('='*(142-7))
     print('Please follow these instructions carefully:')
     print("""Click on the image to choose an object location, then press the number corresponding to the desired object from the options below.""")
@@ -57,6 +76,9 @@ def display_drawing_instructions():
 
 
 def get_dir_path(prompt_dir):
+    
+    """Get user input directory"""
+    
     dir_path = ''
     while os.path.isdir(dir_path) is False:
         if dir_path != '':
@@ -77,12 +99,12 @@ def get_image_paths():
 
 
 def get_annotation_path(dst_dir_path):
-    # get user input path
+    # Get user input path
     annotation_path = input('Enter annotation csv file path: ')
-    # set default path for no input
+    # Set default path for no input
     if annotation_path == '':
         annotation_path = os.path.join(os.path.dirname(dst_dir_path), 'annotations.csv')
-    # set write mode to prevent overwrites
+    # Set write mode to prevent overwrites
     write_mode = 'a'
     # if os.path.isfile(annotation_path):
     #     write_mode = 'a'
