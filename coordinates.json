@@ -1,0 +1,36 @@
+{
+  "images": [{
+    "id": 1,
+    "file_name": "whiteflies_549.jpg",
+    "width": 569,
+    "height": 1024
+  }],
+  "type": "instances",
+  "annotations": [{
+    "segmentation": [12, 316, 12, 840, 560, 840, 560, 316],
+    "image_id": 1,
+    "bbox": [12, 316, 548, 524],
+    "category_id": 1,
+    "id": 1
+  }],
+  "generations": [{
+    "image_id": 1,
+    "point": [316, 548],
+    "category_id": 2,
+    "id": 1
+  }],
+  "categories": [{
+    "supercategory": "none",
+    "id": 1,
+    "name": "leaf"
+  }, {
+    "supercategory": "none",
+    "id": 2,
+    "name": "whitefly"
+  }, {
+    "supercategory": "none",
+    "id": 3,
+    "name": "spidermite"
+  }]
+}
+    
