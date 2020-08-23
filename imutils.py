@@ -2,15 +2,15 @@ import os
 import cv2 as cv
 import numpy as np
 
-def load_object_masks(mask_root, mask_ext, all_objects, stage='adult'):
+def load_object_masks(mask_root, all_objects, stage='adult'):
     """Load provided object masks from input directory"""
     object_masks = {}
     for object_name in all_objects:
         object_mask_paths = []
+        print(mask_root)
         for mask_name in os.listdir(mask_root):
-            if mask_name.endswith(mask_ext):
-                if object_name in mask_name:
-                    object_mask_paths.append(os.path.join(mask_root, mask_name))
+            if object_name in mask_name:
+                object_mask_paths.append(os.path.join(mask_root, mask_name))
         object_masks[object_name] = object_mask_paths
     return object_masks
 
@@ -38,7 +38,8 @@ def copy_paste(image, src_img, paste_bbox, copy_bbox, thresh=95, blending=False)
                     try:
                         image[paste_bbox[0][1] + i, paste_bbox[0][0] + j, k] = src_px + 30
                         success = True
-                    except:
+                    except Exception as e:
+                        print(repr(e))
                         pass
     return image, success
 
@@ -101,6 +102,12 @@ def get_box_area(center, side, safety=1.0):
 def save_annotations(annotations, annotation_path, write_mode):
     with open(annotation_path, write_mode) as f:
         f.write(annotations)
+        
+
+def save_classes_file(classes, classes_path):
+    classes = [f'{obj},{idx}\n' for idx, obj in enumerate(classes)]
+    with open(classes_path, 'w') as f:
+        f.write(' '.join(classes))
 
 
 def update_classes(annotation_path):

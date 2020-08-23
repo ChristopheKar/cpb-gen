@@ -1,0 +1,5 @@
+flask==1.1.1
+flask-cors==3.0.8
+requests==2.22.0
+numpy==1.18.5
+opencv-python==4.4.0.42
