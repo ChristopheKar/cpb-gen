@@ -11,3 +11,4 @@ RUN pip3 install -r requirements.txt
 RUN pip install gunicorn
 
 EXPOSE 5000
+EXPOSE 80

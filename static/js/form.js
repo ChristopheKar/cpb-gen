@@ -51,10 +51,19 @@ $('#uploadForm').on('keyup keypress', function(e) {
     }
 });
 
-window.onload = toggleForm(true);
+window.onload = function() {
+    toggleForm(true);
+    $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
+    $('#infoBtn').tooltip('show');
+}
+
+$(document).on('click', function(evt) {
+    // $('#infoBtn').tooltip('hide');
+    $('[data-toggle="tooltip"]').tooltip('hide');
+});
+
 
 $('#infoBtn').click(function() {
-    console.log('info');
     $('#infoModal').modal('show');
 });
 
