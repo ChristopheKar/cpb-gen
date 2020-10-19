@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.css') }}">
+
+
+    <title>CPB Tool - Generate</title>
+
+  </head>
+
+  <body class="bg-light">
+
+    <div class="container-fluid">
+      <div id="headerTitle" class="py-3 text-center mb-2">
+        <h2>CPB Image Generation Tool</h2>
+        <strong>
+            Right-Click to place points for object generation, and Left-Click to draw bounding boxes for object labeling.
+        </strong>
+      </div>
+
+      <div class="row" id="mainRow">
+        <div id="canvasCol" class="col-md-8 order-md-2 align-items-center">
+          <div id="infoRow" class="row h-5">
+            <div id="respMsg" class="float-left pt-2">Please upload images to begin!</div>
+            <div class="float-right ml-auto">
+              <div id="readyDiv" hidden></div>
+              <button class="btn" id="clearBtn" data-toggle="tooltip" data-placement="top" title="Clear All"><i class="fa fa-trash" aria-hidden="true"></i></button>
+              <button class="btn" id="undoBtn" data-toggle="tooltip" data-placement="top" title="Undo"><i class="fa fa-undo" aria-hidden="true"></i></button>
+              <button class="btn" id="prevBtn" data-toggle="tooltip" data-placement="top" title="Previous"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+              <button class="btn" id="nextBtn" data-toggle="tooltip" data-placement="top" title="Next"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div id="canvasRow" class="row align-items-top h-95 bordered">
+            <canvas id="myCanvas" class="h-100 w-100 mx-auto mb-auto" hidden>
+              Your browser does not support the HTML canvas tag.
+            </canvas>
+            <div id="infoDiv" class="py-3 text-center mb-4">
+              <img class="d-block mx-auto mb-4" src="/static/assets/aub_logo.png" alt="aub-logo" width="224" height="144">
+              <h2>Welcome to the CPB Image Generation Tool!</h2>
+              <p class="lead pb-0 mb-0 px-4">
+                This app allows you to label objects in images using bounding boxes, and generate new images by inserting new objects into existing images. Upload images using the form to the left, then navigate through them using the controls above (top-right). Right-Click to place points for object generation, and Left-Click to draw bounding boxes for object labeling.
+              </p><br>
+            </div>
+          </div>
+        </div>
+        <div id="infoModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">How to use</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                      <div class="mb-3">Start by uploading images to augment or label. These images can be background images with no objects in them. Accepted extensions are "jpg", "jpeg", and "png". You can upload multiple images, the number depends on your connection.</div>
+                      <div class="mb-3">You also need to upload mask images, with the same accepted extensions as above. These are segmented objects that will be inserted into your uploaded target images.</div>
+                      <div class="mb-3">You can try out the app by download the sample images for a pest detection task, extracting the archive, and uploading the images accordingly. <a href="/static/sample/sample.zip">Download</a></div>
+                      <div class="mb-3">Once you select both the images and masks, click on Upload.</div>
+                      <div class="mb-3">Once the upload is successful, the rest of the form will become enabled.</div>
+                      <div class="mb-3">The next section of the form takes care of managing the objects you want to label or generate.</div>
+                      <div class="mb-3">Select an object to label or insert in the "Available Objects" list.</div>
+                      <div class="mb-3">To add new objects, submit an object name in the "Add/Remove Objects" field. If the object exists in the "Available Objects" list, it will be removed, if not it will be added to the list.</div>
+                      <div class="mb-3"><strong>Important: for object generation, the object name you insert has to be present in the mask filename.</strong> For example, if you want to insert an object called "whitefly", the mask filename for that object has to contain the name "whitefly", such as "whitefly_mask_1.png".</div>
+                      <div class="mb-3">To label existing objects, draw a bounding box around them using the left-mouse by clicking and dragging. The object index will be written inside the box.</div>
+                      <div class="mb-3">To place new objects, right-click on the desired location. The object index will be written on top of the placed point.</div>
+                      <div class="mb-3">The object index that will be used for labeling or generating corresponds to the object selected in the "Available Objects" list.</div>
+                      <div class="mb-3">You can cycle through the images using the arrows in the top-right corner of the canvas. There is no need to "save" your annotations before moving to other images, your work will be saved automatically.</div>
+                      <div class="mb-3">You can use the trash button to remove all your annotations from an image, or the undo button to remove your last action.</div>
+                      <div class="mb-3">When your work is done, click on the Generate button. After a while, a Download button will appear at the top of the page. Click on it to download an archive containing your uploaded images, the generated images, and the annotation files should you choose to save them. You can then keep working and re-editing then reclicking on the Generate button to create a new download link with the new files. Once you refresh or close the tab, your session and data will be cleared.</div>
+
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 order-md-1">
+          <div class="row">
+            <h4 class="float-left mr-auto ml-3">
+              Project Setup
+              <button class="btn" id="infoBtn" data-toggle="tooltip" data-placement="top" title="Usage information"><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+            </h4>
+            <a class="download" hidden>
+              <button class="btn btn-success float-right ml-auto mr-3">
+                <i class="fa fa-download" aria-hidden="true"></i>
+                Download
+              </button>
+            </a>
+          </div>
+          <hr class="mb-2 mt-0">
+          <form id="uploadForm" enctype="multipart/form-data" method="post">
+
+            <div class="mb-3">
+                <label>Upload Images</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="srcImages" name="srcImages[]" multiple>
+                        <label id="srcImagesLbl" class="custom-file-label" for="srcImages">Source Images</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="maskImages" name="maskImages[]" multiple>
+                        <label id="maskImagesLbl" class="custom-file-label" for="maskImages">Mask Images</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" id="upload">
+                <i class="fa fa-upload" aria-hidden="true"></i>
+                Upload
+            </button>
+          </form>
+
+          <hr class="mb-2">
+
+          <form id="mainForm" enctype="multipart/form-data" method="get">
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="objectSelector">Available Objects</label>
+                        <select id="objectSelector" class="custom-select">
+                            <option value="" selected>Select Object</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="objectEditor">Add/Remove Objects</label>
+                        <div class="input-group mb-3">
+                        <input id="objectEditor" type="text" class="form-control" placeholder="Object Name" aria-label="Object Name" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-success" type="button" id="objedit">Submit</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-2">
+
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="annName">Annotations File</label>
+                        <input type="text" class="form-control" id="annName" placeholder="annotations.csv" value="annotations.csv" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="clsName">Classes File</label>
+                        <input type="text" class="form-control" id="clsName" placeholder="classes.csv" value="classes.csv" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="save-anns" checked>
+                        <label class="custom-control-label" for="save-anns">Download annotations file</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="save-classes" checked>
+                        <label class="custom-control-label" for="save-classes">Download classes file</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-2">
+            <button class="btn btn-primary btn-lg btn-block" id="generate">
+                <i class="fa fa-download" aria-hidden="true"></i>
+                Generate
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer id="footer" class="footer text-muted text-center text-small pt-3">
+      &copy; 2020-2021 <a href="#">Humans and Machines Lab</a> at the <a href="#">American University of Beirut</a>.
+    </footer>
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/form.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+
+  </body>
+</html>

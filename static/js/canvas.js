@@ -187,20 +187,52 @@ function mouseMove(e) {
     }
 }
 
+$('#readyDiv').on('readydet', function() {
 
-$('#readyDiv').on('ready', function() {
-    
     // Resize canvas and load image
     $('window').on('resize', resizeCanvas);
     resizeCanvas();
     currentImgIdx = 0;
     loadAndDrawImage(currentImgIdx);
-    
+
+    canvas.removeEventListener('mousedown', mouseDown);
+    canvas.removeEventListener('mouseup', mouseUp);
+    canvas.removeEventListener('mousemove', mouseMove);
+
+    // Set previous image event trigger
+    $('#prevBtn').click(function() {
+        if (currentImgIdx > 0) {
+            currentImgIdx = currentImgIdx - 1;
+            previousActions = [];
+            loadAndDrawImage(currentImgIdx);
+        }
+    });
+
+    // Set next image event trigger
+    $('#nextBtn').click(function() {
+        if (currentImgIdx < (imageFnames.length - 1)) {
+            currentImgIdx = currentImgIdx + 1;
+            previousActions = [];
+            loadAndDrawImage(currentImgIdx);
+        }
+    });
+});
+
+
+
+$('#readyDiv').on('ready', function() {
+
+    // Resize canvas and load image
+    $('window').on('resize', resizeCanvas);
+    resizeCanvas();
+    currentImgIdx = 0;
+    loadAndDrawImage(currentImgIdx);
+
     // Set event listeners for mouse drawing
     canvas.addEventListener('mousedown', mouseDown, false);
     canvas.addEventListener('mouseup', mouseUp, false);
     canvas.addEventListener('mousemove', mouseMove, false);
-    
+
     // Set clear all event trigger
     $('#clearBtn').click(function() {
         coordinates[currentImgIdx].existingObjects = [];
@@ -208,7 +240,7 @@ $('#readyDiv').on('ready', function() {
         rect = {};
         redraw();
     });
-    
+
     // Set undo event trigger
     $('#undoBtn').click(function() {
         lastAction = previousActions[previousActions.length - 1]
@@ -220,7 +252,7 @@ $('#readyDiv').on('ready', function() {
         }
         redraw();
     });
-    
+
     // Set previous image event trigger
     $('#prevBtn').click(function() {
         if (currentImgIdx > 0) {
@@ -229,7 +261,7 @@ $('#readyDiv').on('ready', function() {
             loadAndDrawImage(currentImgIdx);
         }
     });
-    
+
     // Set next image event trigger
     $('#nextBtn').click(function() {
         if (currentImgIdx < (imageFnames.length - 1)) {

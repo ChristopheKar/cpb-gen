@@ -36,7 +36,7 @@ $('#objedit').on('click', function() {
 // Disable Enter to Submit
 $('#mainForm').on('keyup keypress', function(e) {
     var keyCode = e.keyCode || e.which;
-    if (keyCode === 13) { 
+    if (keyCode === 13) {
         e.preventDefault();
         return false;
     }
@@ -45,7 +45,7 @@ $('#mainForm').on('keyup keypress', function(e) {
 // Disable Enter to Submit
 $('#uploadForm').on('keyup keypress', function(e) {
     var keyCode = e.keyCode || e.which;
-    if (keyCode === 13) { 
+    if (keyCode === 13) {
         e.preventDefault();
         return false;
     }
@@ -72,7 +72,6 @@ $('#srcImages').change(function(e) {
 });
 
 $('#maskImages').change(function(e) {
-    console.log(e);
     $("#maskImagesLbl").html($("#maskImages")[0].files.length + ' masks selected');
 });
 
@@ -103,6 +102,69 @@ $('#upload').on('click', function() {
           imageFnames = message.images;
           setImageFiles(imageFnames);
           $('#readyDiv').trigger('ready');
+        },
+        error: function(data) {
+          console.log(data);
+          $('#respMsg').removeClass('text-success').addClass('text-danger');
+          errorMsg = JSON.parse(data.responseText).error;
+          console.log(data.status, data.statusText, "error:", errorMsg);
+          $('#respMsg').text(errorMsg);
+        }
+    });
+    return false;
+});
+
+
+$('#uploadDet').on('click', function() {
+
+    postData = new FormData();
+    for (var i = 0; i < $("#srcImages")[0].files.length; i++) {
+        postData.append('images[]', ($("#srcImages")[0].files[i]));
+    }
+
+    $('#respMsg').text('Uploading, please wait...');
+    $.ajax({
+        type:'POST',
+        method: 'POST',
+        url:'/upload-det',
+        processData: false,
+        contentType: false,
+        data : postData,
+        success: function(message, status, data) {
+          console.log(data.status, data.statusText, "message:", message.message);
+          $('#respMsg').removeClass('text-danger').addClass('text-success');
+          $('#respMsg').text('Upload successful!');
+          toggleForm(false);
+          $('.download').attr('id', message.sid);
+          $('#infoDiv').hide();
+          $('#myCanvas').prop('hidden', false);
+          imageFnames = message.images;
+          setImageFiles(imageFnames);
+          $('#readyDiv').trigger('readydet');
+          $('#respMsg').text('Detecting objects, please wait...');
+          $.ajax({
+              type:'POST',
+              method: 'POST',
+              url:'/detect',
+              processData: false,
+              contentType: 'application/json',
+              data : JSON.stringify({"sid": $('.download').attr('id')}),
+              success: function(message, status, data) {
+                console.log(data.status, data.statusText, "message:", message.message);
+                $('#respMsg').removeClass('text-danger').addClass('text-success');
+                $('#respMsg').text('Detection successful!');
+                imageFnames = message.images;
+                setImageFiles(imageFnames);
+                $('#readyDiv').trigger('readydet');
+              },
+              error: function(data) {
+                console.log(data);
+                $('#respMsg').removeClass('text-success').addClass('text-danger');
+                errorMsg = JSON.parse(data.responseText).error;
+                console.log(data.status, data.statusText, "error:", errorMsg);
+                $('#respMsg').text(errorMsg);
+              }
+          });
         },
         error: function(data) {
           console.log(data);
