@@ -6,7 +6,7 @@ from flask import Flask, redirect, url_for, render_template, Response
 from flask import session, request
 from werkzeug.utils import secure_filename
 
-import gen
+import generation, detection
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -114,7 +114,7 @@ def generate():
             root_dir = f'static/tmp_{label_info["sid"]}'
             src_img_dir, masks_dir, output_dir = get_dirnames(root_dir, 'gen')
 
-            zfile = gen.generate(
+            zfile = generation.generate(
                 label_info['coordinates'],
                 root_dir, src_img_dir, masks_dir, output_dir,
                 label_info['annotation_filename'], label_info['classes_filename'],
@@ -190,7 +190,18 @@ def det_det():
             if (len(saved_images) == 0):
                 return Response('{"error": "No image files."}', status=400, mimetype='application/json')
 
-            return {"message": "Successful detection!", "images": saved_images}, 200
+            detection.run(saved_images, os.path.dirname(img_dir))
+            detected_images = []
+            for file in os.listdir(img_dir):
+                detected_images.append(os.path.join(img_dir, file))
+
+            # zip output into one directory
+            zname = 'detected'
+            zdir = os.path.join(root_dir, zname)
+            zdir_path = shutil.make_archive(zdir, 'zip', root_dir=root_dir)
+            zdir_path = zdir_path.replace('/home', '')
+
+            return {"message": "Successful detection!", "images": detected_images, "filepath": zdir_path}, 200
 
         return Response('{"error": "Method not allowed for the requested URL."}', status=405, mimetype='application/json')
 

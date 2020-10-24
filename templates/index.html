@@ -6,52 +6,98 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.css') }}">
 
 
-    <title>CPB Tool - Detection</title>
+    <title>CPB Tool</title>
 
   </head>
 
   <body class="bg-light">
 
-    <div class="container">
-      <div id="headerTitle" class="py-5 text-center mb-5">
-        <div id="infoDiv w-100" class="py-5 text-center mb-5">
-          <img class="d-block mx-auto mb-5" src="/static/assets/aub_logo.png" alt="aub-logo" width="224" height="144">
-          <h2>Welcome to the CPB Image Generation and Pest Detection Tool!</h2>
-          <p class="lead mt-5 px-4">
+    <div id="container" class="container-fluid" style="width: 70%">
+
+        <div id="logoRow" class="row mx-auto pt-4">
+          <img class="mx-auto mb-3" src="/static/assets/aub_logo.png" alt="aub-logo" width="224" height="144">
+        </div>
+        <div id="titleRow" class="row mx-auto">
+          <h2 class="mx-auto">Welcome to the CPB Image Generation and Pest Detection Tool!</h2>
+        </div>
+        <div id="descriptionRow" class="row mx-auto">
+          <p class="lead mt-3 px-4 mx-auto">
             These applications were developed by the <a href="//sites.aub.edu.lb/hmlab/">Humans and Machines Lab</a>
             at the <a href="//aub.edu.lb">American University of Beirut</a> under the <a href="//aub.edu.lb/fafs/WEFRAH/Pages/default.aspx">WEFRAH</a> initiative, tackling plant health.
           </p>
-          <p class="lead pb-0 mb-2 px-4">
-            The <a href="/gen" style="color: #32a852; font-weight:bold;">Generation</a> app can be used to label objects within images using bounding boxes, and even artificially augment these images with new objects to reduce data collection and labeling efforts.
-          </p>
-          <p class="lead pb-0 mb-4 px-4">
-            The <a href="/det" style="color: #32a852; font-weight:bold;">Detection</a> app can be used to detect <i>Bemisia tabaci</i> whiteflies on plant leaves.
-          </p>
-          <a class="btn btn-primary btn-lg btn-block w-50 mx-auto bg-success text-white border-success" href="/gen">
-            <i class="far fa-edit" aria-hidden="true"></i>
-              Generate
-          </a>
-          <a class="btn btn-primary btn-lg btn-block w-50 mx-auto bg-success text-white border-success" href="/det">
-            <i class="fas fa-crosshairs" aria-hidden="true"></i>
-              Detect
-          </a>
         </div>
-      </div>
 
-      <div class="row" id="mainRow">
+        <div id="imgRow" class="row mb-3">
+          <div class="col-md-6 col-lg-6 text-center">
+            <img id="w0" class="mx-auto" src="/static/assets/whiteflies_0.jpg" alt="whitefly-detections">
+          </div>
+          <div class="col-md-6 col-lg-6 text-center">
+            <img id="w1" class="mx-auto" src="/static/assets/whiteflies_1.jpg" alt="whitefly-detections">
+          </div>
+        </div>
 
-      </div>
+        <div id="appRow" class="row py-2 text-center pb-3">
+          <div class="col-md-6">
+            <p class="lead pb-0 mb-2 px-4">
+              The <a href="/gen" style="color: #32a852; font-weight:bold;">Generation</a> app
+              can be used to label objects within images using bounding boxes, and artificially
+              augment these images with new objects to reduce data collection and labeling efforts.
+            </p>
+            <a class="btn btn-primary btn-lg btn-block w-50 mx-auto bg-success text-white border-success" href="/gen">
+              <i class="far fa-edit" aria-hidden="true"></i>
+                Generate
+            </a>
+          </div>
+          <div class="col-md-6">
+            <p class="lead pb-0 mb-2 px-4">
+              The <a href="/det" style="color: #32a852; font-weight:bold;">Detection</a> app
+              can be used to detect <i>Bemisia tabaci</i> whiteflies on plant leaves using a
+              You-Only-Look-Once (YOLO) object detection model. The model will be updated with new pests!
+            </p>
+
+            <a class="btn btn-primary btn-lg btn-block w-50 mx-auto bg-success text-white border-success" href="/det">
+              <i class="fas fa-crosshairs" aria-hidden="true"></i>
+                Detect
+            </a>
+          </div>
+        </div>
+
     </div>
 
     <footer id="footer" class="footer text-muted text-center text-small pt-3">
       &copy; 2020-2021 <a href="//sites.aub.edu.lb/hmlab/">Humans and Machines Lab</a> at the <a href="//aub.edu.lb">American University of Beirut</a>.
     </footer>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+      const aspectRatio = 0.7883211678832117; // width/height = 1080/1370
+      var clamp = function(number, min, max) {
+        return Math.max(min, Math.min(number, max));
+      };
+      var resizeImgRow = function() {
+        var imgRowHeight = window.innerHeight
+                           - document.getElementById('container').clientHeight
+                           - 20
+                           - document.getElementById('footer').clientHeight
+                           + document.getElementById('imgRow').clientHeight;
+
+        imgRowHeight = clamp(imgRowHeight, 274, 1370);
+
+        document.getElementById('imgRow').style.height = imgRowHeight;
+        document.getElementById('imgRow').style.minHeight = imgRowHeight;
+        document.getElementById('imgRow').style.maxHeight = imgRowHeight;
+        document.getElementById('w0').height = imgRowHeight;
+        document.getElementById('w0').width = imgRowHeight*aspectRatio;
+        document.getElementById('w1').height = imgRowHeight;
+        document.getElementById('w1').width = imgRowHeight*aspectRatio;
+      };
+      window.onload = resizeImgRow;
+      window.onresize = resizeImgRow;
+
+    </script>
 
   </body>
 </html>

@@ -155,6 +155,8 @@ $('#uploadDet').on('click', function() {
                 $('#respMsg').text('Detection successful!');
                 imageFnames = message.images;
                 setImageFiles(imageFnames);
+                $('.download').prop('hidden', false);
+                $('.download').attr('href', message.filepath);
                 $('#readyDiv').trigger('readydet');
               },
               error: function(data) {
