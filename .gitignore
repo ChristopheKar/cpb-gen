@@ -1,2 +1,3 @@
 archive
 static/tmp*
+__pycache__/
