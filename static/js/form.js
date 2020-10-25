@@ -121,7 +121,10 @@ $('#uploadDet').on('click', function() {
     for (var i = 0; i < $("#srcImages")[0].files.length; i++) {
         postData.append('images[]', ($("#srcImages")[0].files[i]));
     }
-
+    $('#uploadIcon').hide();
+    $('#spinnerIcon').prop('hidden', false);
+    $('#spinnerIcon').show();
+    $('#uploadDetText').html('Uploading...');
     $('#respMsg').text('Uploading, please wait...');
     $.ajax({
         type:'POST',
@@ -142,6 +145,10 @@ $('#uploadDet').on('click', function() {
           setImageFiles(imageFnames);
           $('#readyDiv').trigger('readydet');
           $('#respMsg').text('Detecting objects, please wait...');
+          $('#uploadIcon').hide();
+          $('#spinnerIcon').prop('hidden', false);
+          $('#spinnerIcon').show();
+          $('#uploadDetText').html('Detecting...');
           $.ajax({
               type:'POST',
               method: 'POST',
@@ -154,10 +161,13 @@ $('#uploadDet').on('click', function() {
                 $('#respMsg').removeClass('text-danger').addClass('text-success');
                 $('#respMsg').text('Detection successful!');
                 imageFnames = message.images;
-                setImageFiles(imageFnames);
+                setImageFiles(imageFnames, mode='det');
                 $('.download').prop('hidden', false);
                 $('.download').attr('href', message.filepath);
                 $('#readyDiv').trigger('readydet');
+                $('#spinnerIcon').hide();
+                $('#uploadIcon').show();
+                $('#uploadDetText').html('Detect');
               },
               error: function(data) {
                 console.log(data);
@@ -165,6 +175,9 @@ $('#uploadDet').on('click', function() {
                 errorMsg = JSON.parse(data.responseText).error;
                 console.log(data.status, data.statusText, "error:", errorMsg);
                 $('#respMsg').text(errorMsg);
+                $('#spinnerIcon').hide();
+                $('#uploadIcon').show();
+                $('#uploadDetText').html('Detect');
               }
           });
         },
@@ -174,6 +187,9 @@ $('#uploadDet').on('click', function() {
           errorMsg = JSON.parse(data.responseText).error;
           console.log(data.status, data.statusText, "error:", errorMsg);
           $('#respMsg').text(errorMsg);
+          $('#spinnerIcon').hide();
+          $('#uploadIcon').show();
+          $('#uploadDetText').html('Detect');
         }
     });
     return false;

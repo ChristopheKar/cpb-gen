@@ -55,7 +55,7 @@ function getCurrentObject() {
 
 
 // Load and display image on canvas
-function loadAndDrawImage(curImIdx) {
+function loadAndDrawImage(curImIdx, mode='gen') {
     // Create an image object. This is not attached to the DOM and is not part of the page.
     imageObj = new Image();
     // When the image has loaded, draw it to the canvas
@@ -71,7 +71,11 @@ function loadAndDrawImage(curImIdx) {
         redraw();
     }
     // Set the source of the image to load
-    imageObj.src = '/static/tmp_' + $('.download').attr('id') + '/images/' + imageFnames[curImIdx];
+    if (mode === 'gen') {
+      imageObj.src = '/static/tmp_' + $('.download').attr('id') + '/images/' + imageFnames[curImIdx];
+    } else {
+      imageObj.src = '/static/tmp_' + $('.download').attr('id') + '/detection/images/' + imageFnames[curImIdx];
+    }
 };
 
 

@@ -191,9 +191,7 @@ def det_det():
                 return Response('{"error": "No image files."}', status=400, mimetype='application/json')
 
             detection.run(saved_images, os.path.dirname(img_dir))
-            detected_images = []
-            for file in os.listdir(img_dir):
-                detected_images.append(os.path.join(img_dir, file))
+            detected_images = [file for file in os.listdir(img_dir)]
 
             # zip output into one directory
             zname = 'detected'
