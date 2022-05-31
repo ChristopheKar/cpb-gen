@@ -16,6 +16,17 @@ Future functionalities that the tool can provide:
 - Labeling through segmentation, in order to more precisely label objects for semantic segmentation tasks, or even generate the object masks through the tool. (In the current version, the user provides the objects masks, which have to be obtained through segmentation-labeling).
 - Training models directly through the web interface: both GANs for object masks and Object Detectors.
 
+## Training
+
+The model architecture can be found under `network/whiteflies.cfg`, and the weights under `network/whiteflies.weights`.
+This model has been trained with the Darknet framework, which can be found [here](https://github.com/pjreddie/darknet).
+
+### GAN-Training
+
+GANs can be used to increase the number of object masks. In our example, the objects of interests are whiteflies.
+Using 32x32 masks of these whiteflies, we can train a DCGAN to generate new whiteflies.
+We use [this](https://github.com/mitchelljy/DCGAN-Keras) implementation of a DCGAN in Keras to generate 32x32 whiteflies (training for 100000 epochs).
+
 ## Usage
 
 The webapp is written in Python using Flask and served with Gunicorn. Deployment is easy as the entire application and its environment are containerized with Docker.\
